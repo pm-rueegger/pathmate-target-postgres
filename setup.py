@@ -5,20 +5,20 @@ from setuptools import setup
 with open('README.md') as f:
     long_description = f.read()
 
-setup(name="pipelinewise-target-postgres",
+setup(name="pathmate-target-postgres",
       version="2.1.2",
       description="Singer.io target for loading data to PostgreSQL - PipelineWise compatible",
       long_description=long_description,
       long_description_content_type='text/markdown',
       author="TransferWise",
-      url='https://github.com/transferwise/pipelinewise-target-postgres',
+      url='https://github.com/pm-rueegger/pathmate-target-postgres',
       classifiers=[
           'License :: OSI Approved :: Apache Software License',
           'Programming Language :: Python :: 3 :: Only'
       ],
       py_modules=["target_postgres"],
       install_requires=[
-          'pipelinewise-singer-python==1.*',
+          'pipelinewise-singer-python==1.3.0',
           'psycopg2-binary==2.9.5',
           'inflection==0.3.1',
           'joblib==1.2.0'
