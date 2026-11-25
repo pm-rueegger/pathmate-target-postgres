@@ -77,6 +77,8 @@ Full list of options in `config.json`:
 | user                                | String  | Yes        | PostgreSQL user                                               |
 | password                            | String  | Yes        | PostgreSQL password                                           |
 | dbname                              | String  | Yes        | PostgreSQL database name                                      |
+| sslmode                             | String  |            | PostgreSQL SSL mode (`disable`, `allow`, `prefer`, `require`, `verify-ca`, `verify-full`). |
+| sslrootcert                         | String  |            | Path to the CA certificate (PEM) used to verify the server certificate. Required for `verify-ca` / `verify-full`. |
 | batch_size_rows                     | Integer |            | (Default: 100000) Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Postgres. |
 | flush_all_streams                   | Boolean |            | (Default: False) Flush and load every stream into Postgres when one batch is full. Warning: This may trigger the COPY command to use files with low number of records. |
 | parallelism                         | Integer |            | (Default: 0) The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max. |

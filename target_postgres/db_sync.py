@@ -1,5 +1,6 @@
 import json
 import sys
+import os
 import psycopg2
 import psycopg2.extras
 import inflection
@@ -33,7 +34,30 @@ def validate_config(config):
     if not config_default_target_schema and not config_schema_mapping:
         errors.append("Neither 'default_target_schema' (string) nor 'schema_mapping' (object) keys set in config.")
 
+    # Check TLS config
+    sslmode, sslrootcert = get_ssl_settings(config)
+    if sslmode and sslmode not in VALID_SSLMODES:
+        errors.append("Invalid sslmode [{}]. Valid values: {}".format(sslmode, ', '.join(VALID_SSLMODES)))
+    if sslmode in ('verify-ca', 'verify-full'):
+        if not sslrootcert:
+            errors.append("sslrootcert is required when sslmode is [{}]".format(sslmode))
+        elif not os.path.isfile(sslrootcert):
+            errors.append("sslrootcert file does not exist: [{}]".format(sslrootcert))
+
     return errors
+
+
+VALID_SSLMODES = ('disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full')
+
+
+def get_ssl_settings(config):
+    """Return (sslmode, sslrootcert) from the config.
+    The legacy `ssl: 'true'` option maps to sslmode 'require'."""
+    sslmode = config.get('sslmode')
+    if not sslmode and config.get('ssl') == 'true':
+        sslmode = 'require'
+    sslrootcert = config.get('sslrootcert')
+    return sslmode or None, sslrootcert or None
 
 
 # pylint: disable=fixme
@@ -299,10 +323,14 @@ class DbSync:
             self.connection_config['port']
         )
 
-        if 'ssl' in self.connection_config and self.connection_config['ssl'] == 'true':
-            conn_string += " sslmode='require'"
+        ssl_options = {}
+        sslmode, sslrootcert = get_ssl_settings(self.connection_config)
+        if sslmode:
+            ssl_options['sslmode'] = sslmode
+        if sslrootcert:
+            ssl_options['sslrootcert'] = sslrootcert
 
-        return psycopg2.connect(conn_string)
+        return psycopg2.connect(conn_string, **ssl_options)
 
     def query(self, query, params=None):
         self.logger.debug("Running query: %s", query)
