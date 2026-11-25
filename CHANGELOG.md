@@ -1,3 +1,7 @@
+2.2.0 (2026-11-25)
+-------------------
+- Add `sslmode` and `sslrootcert` options to support TLS with server certificate verification (`verify-ca`, `verify-full`)
+
 2.1.2 (2023-01-17)
 -------------------
 - Add python 3.10 compatibility
